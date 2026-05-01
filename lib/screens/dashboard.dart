@@ -1,4 +1,5 @@
 import 'package:finance_app/screens/add_transaction.dart';
+import 'package:finance_app/widgets/app_drawer.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -22,8 +23,8 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Column(children: [Text('Finance')]),
+        // backgroundColor: Theme.of(context).colorScheme.primary,
+        child: AppDrawer(),
       ),
       body: Center(child: Text('Will Come soon!!')),
     );
