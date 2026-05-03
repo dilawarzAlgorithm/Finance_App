@@ -15,7 +15,6 @@ final colorScheme =
     );
 
 final theme = ThemeData(
-  useMaterial3: true,
   colorScheme: colorScheme,
   scaffoldBackgroundColor: colorScheme.surface,
 
