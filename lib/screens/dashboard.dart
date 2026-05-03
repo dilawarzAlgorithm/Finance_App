@@ -22,10 +22,7 @@ class DashboardScreen extends StatelessWidget {
           ),
         ],
       ),
-      drawer: Drawer(
-        // backgroundColor: Theme.of(context).colorScheme.primary,
-        child: AppDrawer(),
-      ),
+      drawer: Drawer(child: AppDrawer()),
       body: Center(child: Text('Will Come soon!!')),
     );
   }
