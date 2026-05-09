@@ -1,7 +1,9 @@
+import 'package:uuid/uuid.dart';
+
 enum TransactionType { credit, debit }
 
 class TransactionModel {
-  const TransactionModel({
+  TransactionModel({
     this.id,
     required this.title,
     required this.amount,
@@ -10,7 +12,7 @@ class TransactionModel {
     required this.categoryId,
   });
 
-  final int? id;
+  String? id = Uuid().v4();
   final String title;
   final double amount;
   final DateTime date;
@@ -19,7 +21,7 @@ class TransactionModel {
 
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
-      id: map['id'] as int?,
+      id: map['id'] as String,
       title: map['title'] as String,
       amount: (map['amount'] as num).toDouble(),
       date: DateTime.parse(map['date'] as String),
