@@ -25,7 +25,7 @@ class CategoryModel {
     return CategoryModel(
       id: map['id'] as int?,
       name: map['name'] as String,
-      colorHex: map['color'] as String,
+      colorHex: map['colorHex'] as String,
       iconCodePoint: map['icon_code_point'] as int,
     );
   }
@@ -34,7 +34,7 @@ class CategoryModel {
     return {
       'id': id,
       'name': name,
-      'color': colorHex,
+      'colorHex': colorHex,
       'icon_code_point': iconCodePoint,
     };
   }
