@@ -33,6 +33,7 @@ class TransactionModel {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'title': title,
       'amount': amount,
       'date': date.toIso8601String(),

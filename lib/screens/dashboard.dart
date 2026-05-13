@@ -7,7 +7,6 @@ import 'package:finance_app/widgets/app_drawer.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
-
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
@@ -23,18 +22,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         centerTitle: false,
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (cntx) => const AddTransactionScreen(),
                 ),
               );
+              if (mounted) {
+                setState(() {});
+              }
+              ;
             },
             icon: const Icon(Icons.add),
           ),
         ],
       ),
-      drawer: const Drawer(child: AppDrawer()),
+      drawer: Drawer(child: AppDrawer()),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {

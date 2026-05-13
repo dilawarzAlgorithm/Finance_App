@@ -25,6 +25,11 @@ class DatabaseHelper {
     });
   }
 
+  Future<void> deleteTransaction(int id) async {
+    final db = await database;
+    db.delete('transactions', where: 'id = ?', whereArgs: [id]);
+  }
+
   Future<List<CategoryModel>> getParticularCategories(int id) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(

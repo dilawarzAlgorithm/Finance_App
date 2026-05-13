@@ -58,34 +58,56 @@ class _TransactionsState extends State<Transactions> {
         final tx = _transactions[ind];
         final category = _categoryMap[tx.categoryId];
 
-        return Column(
-          children: [
-            ListTile(
-              leading: CircleAvatar(
-                backgroundColor:
-                    category?.color.withAlpha(40) ?? Colors.grey.withAlpha(40),
-                child: Icon(
-                  category?.icon ?? Icons.help_outline,
-                  color: category?.color ?? Colors.grey,
+        return Dismissible(
+          key: ValueKey(_transactions[ind]),
+          background: Container(
+            color: Colors.red,
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Icon(Icons.delete, color: Colors.white),
+          ),
+          direction: DismissDirection.endToStart,
+          onDismissed: (direction) async {
+            await db.deleteTransaction(tx.id!);
+            setState(() {
+              _transactions.removeAt(ind);
+            });
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('${tx.title} dismissed')));
+          },
+          child: Column(
+            children: [
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor:
+                      category?.color.withAlpha(40) ??
+                      Colors.grey.withAlpha(40),
+                  child: Icon(
+                    category?.icon ?? Icons.help_outline,
+                    color: category?.color ?? Colors.grey,
+                  ),
+                ),
+                title: Text(
+                  tx.title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(DateFormat.yMMMd().format(tx.date)),
+                trailing: Text(
+                  '${tx.type == TransactionType.debit ? "-" : "+"} ₹${tx.amount.toStringAsFixed(2)}',
+                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: tx.type == TransactionType.credit
+                        ? Colors.green
+                        : Colors.red,
+                  ),
                 ),
               ),
-              title: Text(
-                tx.title,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              subtitle: Text(DateFormat.yMMMd().format(tx.date)),
-              trailing: Text(
-                '${tx.type == TransactionType.debit ? "-" : "+"} ₹${tx.amount.toStringAsFixed(2)}',
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: tx.type == TransactionType.credit
-                      ? Colors.green
-                      : Colors.red,
-                ),
-              ),
-            ),
-            const Divider(height: 1),
-          ],
+              const Divider(height: 1),
+            ],
+          ),
         );
       },
     );
