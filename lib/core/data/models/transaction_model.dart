@@ -19,7 +19,7 @@ class TransactionModel {
 
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
     return TransactionModel(
-      id: map['id'] as int,
+      id: map['id'] as int?,
       title: map['title'] as String,
       amount: (map['amount'] as num).toDouble(),
       date: DateTime.parse(map['date'] as String),
