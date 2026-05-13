@@ -65,7 +65,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('Transaction Saved')));
 
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
     }
   }
 

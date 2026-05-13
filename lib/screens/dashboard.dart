@@ -13,6 +13,13 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
+  Key _transactionsKey = UniqueKey();
+
+  void _refreshTransactions() {
+    setState(() {
+      _transactionsKey = UniqueKey();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,21 +30,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
         actions: [
           IconButton(
             onPressed: () async {
-              await Navigator.of(context).push(
+              final result = await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (cntx) => const AddTransactionScreen(),
                 ),
               );
-              if (mounted) {
-                setState(() {});
+              if (result == true && mounted) {
+                _refreshTransactions();
               }
-              ;
             },
             icon: const Icon(Icons.add),
           ),
         ],
       ),
-      drawer: Drawer(child: AppDrawer()),
+      drawer: Drawer(
+        child: AppDrawer(onTransactionAdded: _refreshTransactions),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
@@ -56,7 +64,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: <Widget>[Analytics(), Transactions()][_selectedIndex],
+      body: <Widget>[
+        Analytics(),
+        Transactions(key: _transactionsKey),
+      ][_selectedIndex],
     );
   }
 }

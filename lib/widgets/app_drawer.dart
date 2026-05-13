@@ -2,7 +2,9 @@ import 'package:finance_app/screens/add_transaction.dart';
 import 'package:flutter/material.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  const AppDrawer({super.key, required this.onTransactionAdded});
+
+  final VoidCallback onTransactionAdded;
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +53,14 @@ class AppDrawer extends StatelessWidget {
             size: 20,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          onTap: () {
+          onTap: () async {
             Navigator.of(context).pop();
-            Navigator.of(context).push(
+            final result = await Navigator.of(context).push(
               MaterialPageRoute(builder: (cntx) => AddTransactionScreen()),
             );
+            if (result == true) {
+              onTransactionAdded();
+            }
           },
         ),
       ],
