@@ -33,10 +33,8 @@ class TransactionModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'title': title,
       'amount': amount,
-      // Store DateTime as ISO8601 String
       'date': date.toIso8601String(),
       'type': type.name,
       'category_id': categoryId,

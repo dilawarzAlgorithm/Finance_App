@@ -1,5 +1,6 @@
 import 'package:finance_app/core/data/models/category_model.dart';
 import 'package:finance_app/core/data/models/transaction_model.dart';
+import 'package:finance_app/core/database/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -16,15 +17,16 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   DateTime _dateController = DateTime.now();
   final _dateTextController = TextEditingController();
   TransactionType _ttypeController = TransactionType.debit;
-  List<CategoryModel> _availableCategories = []; // Felled from DB
+  List<CategoryModel> _availableCategories = [];
   CategoryModel? _selectedCategory;
+  bool _isCategoryLoading = true;
 
   @override
   void initState() {
     super.initState();
-
     _dateTextController.text =
         '${_dateController.day}/${_dateController.month}/${_dateController.year}';
+    _loadCategories();
   }
 
   @override
@@ -35,17 +37,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     super.dispose();
   }
 
-  void _saveTransaction() {
+  Future<void> _loadCategories() async {
+    final categories = await DatabaseHelper.instance.getAllCategories();
+    setState(() {
+      _availableCategories = categories;
+      _isCategoryLoading = false;
+    });
+  }
+
+  void _saveTransaction() async {
     if (_formKey.currentState!.validate()) {
-      final title = _titleController.text.trim();
+      final newTransaction = TransactionModel(
+        title: _titleController.text.trim(),
+        amount: double.parse(_amountController.text),
+        date: _dateController,
+        type: _ttypeController,
+        categoryId: _selectedCategory!.id!,
+      );
 
-      final amount = double.parse(_amountController.text);
+      final db = await DatabaseHelper.instance.database;
+      await db.insert('transactions', newTransaction.toMap());
 
-      debugPrint(title);
-      debugPrint(amount.toString());
-      debugPrint(_dateController.toString());
-      debugPrint(_ttypeController.toString());
-      debugPrint((_selectedCategory != null) ? _selectedCategory!.name : '');
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(
@@ -164,8 +177,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       Expanded(
                         child: DropdownButtonFormField<CategoryModel>(
                           initialValue: _selectedCategory,
-                          decoration: const InputDecoration(
-                            labelText: 'Category',
+                          decoration: InputDecoration(
+                            label: (_isCategoryLoading)
+                                ? Icon(Icons.loop)
+                                : Text('Category'),
                           ),
                           items: _availableCategories.map((cat) {
                             return DropdownMenuItem(

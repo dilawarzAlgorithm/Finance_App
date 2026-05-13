@@ -1,3 +1,4 @@
+import 'package:finance_app/core/data/models/transaction_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:finance_app/core/data/models/category_model.dart';
@@ -13,6 +14,24 @@ class DatabaseHelper {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
+  }
+
+  Future<List<CategoryModel>> getAllCategories() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('categories');
+
+    return List.generate(maps.length, (i) {
+      return CategoryModel.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<TransactionModel>> getAllTransactions() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('transactions');
+
+    return List.generate(maps.length, (i) {
+      return TransactionModel.fromMap(maps[i]);
+    });
   }
 
   Future<Database> _initDatabase() async {
