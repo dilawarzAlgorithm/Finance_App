@@ -25,6 +25,19 @@ class DatabaseHelper {
     });
   }
 
+  Future<List<CategoryModel>> getParticularCategories(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'categories',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    return List.generate(maps.length, (i) {
+      return CategoryModel.fromMap(maps[i]);
+    });
+  }
+
   Future<List<TransactionModel>> getAllTransactions() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('transactions');
