@@ -1,6 +1,7 @@
 import 'package:finance_app/core/data/models/category_model.dart';
 import 'package:finance_app/core/data/models/transaction_model.dart';
 import 'package:finance_app/core/database/database_helper.dart';
+import 'package:finance_app/core/services/finance_calculator.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -28,8 +29,9 @@ class _TransactionsState extends State<Transactions> {
   Future<void> _loadData() async {
     final transData = await db.getAllTransactions();
     final catData = await db.getAllCategories();
-    final double incoming = await db.totalIncoming();
-    final double outgoing = await db.totalOutgoing();
+    final FinanceStats stats = FinanceCalculator.calculateStats(transData);
+    final double incoming = stats.totalIncome;
+    final double outgoing = stats.totalExpense;
 
     final Map<int, CategoryModel> tempMap = {
       for (var cat in catData) cat.id!: cat,
@@ -88,12 +90,9 @@ class _TransactionsState extends State<Transactions> {
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) async {
                   await db.deleteTransaction(tx.id!);
-                  final double incoming = await db.totalIncoming();
-                  final double outgoing = await db.totalOutgoing();
                   setState(() {
                     _transactions.removeAt(ind);
-                    _incoming = incoming;
-                    _outgoing = outgoing;
+                    _loadData();
                   });
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).clearSnackBars();
