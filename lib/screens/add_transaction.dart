@@ -45,7 +45,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     });
   }
 
-  void _saveTransaction() async {
+  void _saveTransaction() {
     if (_formKey.currentState!.validate()) {
       final newTransaction = TransactionModel(
         title: _titleController.text.trim(),
@@ -55,10 +55,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         categoryId: _selectedCategory!.id!,
       );
 
-      final db = await DatabaseHelper.instance.database;
-      await db.insert('transactions', newTransaction.toMap());
-
-      if (!mounted) return;
+      final db = DatabaseHelper.instance;
+      db.saveTransaction(newTransaction);
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(

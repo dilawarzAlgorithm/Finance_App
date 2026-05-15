@@ -45,7 +45,10 @@ class DatabaseHelper {
 
   Future<List<TransactionModel>> getAllTransactions() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('transactions');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'transactions',
+      orderBy: 'date DESC',
+    );
 
     return List.generate(maps.length, (i) {
       return TransactionModel.fromMap(maps[i]);
@@ -66,6 +69,11 @@ class DatabaseHelper {
       'SELECT SUM(amount) as total FROM transactions WHERE type="debit"',
     );
     return (ans[0]['total'] ?? 0.0) as double;
+  }
+
+  void saveTransaction(TransactionModel newTransaction) async {
+    final db = await database;
+    await db.insert('transactions', newTransaction.toMap());
   }
 
   Future<Database> _initDatabase() async {
