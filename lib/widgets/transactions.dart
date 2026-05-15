@@ -15,6 +15,8 @@ class _TransactionsState extends State<Transactions> {
   final db = DatabaseHelper.instance;
   List<TransactionModel> _transactions = [];
   Map<int, CategoryModel> _categoryMap = {};
+  double _incoming = 0.0;
+  double _outgoing = 0.0;
   bool _isLoading = true;
 
   @override
@@ -26,6 +28,8 @@ class _TransactionsState extends State<Transactions> {
   Future<void> _loadData() async {
     final transData = await db.getAllTransactions();
     final catData = await db.getAllCategories();
+    final double incoming = await db.totalIncoming();
+    final double outgoing = await db.totalOutgoing();
 
     final Map<int, CategoryModel> tempMap = {
       for (var cat in catData) cat.id!: cat,
@@ -36,6 +40,8 @@ class _TransactionsState extends State<Transactions> {
     setState(() {
       _transactions = transData;
       _categoryMap = tempMap;
+      _incoming = incoming;
+      _outgoing = outgoing;
       _isLoading = false;
     });
   }
@@ -52,64 +58,119 @@ class _TransactionsState extends State<Transactions> {
       );
     }
 
-    return ListView.builder(
-      itemCount: _transactions.length,
-      itemBuilder: (cntx, ind) {
-        final tx = _transactions[ind];
-        final category = _categoryMap[tx.categoryId];
-
-        return Dismissible(
-          key: ValueKey(_transactions[ind]),
-          background: Container(
-            color: Colors.red,
-            alignment: Alignment.centerRight,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Icon(Icons.delete, color: Colors.white),
-          ),
-          direction: DismissDirection.endToStart,
-          onDismissed: (direction) async {
-            await db.deleteTransaction(tx.id!);
-            setState(() {
-              _transactions.removeAt(ind);
-            });
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('${tx.title} dismissed')));
-          },
-          child: Column(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
             children: [
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor:
-                      category?.color.withAlpha(40) ??
-                      Colors.grey.withAlpha(40),
-                  child: Icon(
-                    category?.icon ?? Icons.help_outline,
-                    color: category?.color ?? Colors.grey,
-                  ),
-                ),
-                title: Text(
-                  tx.title,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                subtitle: Text(DateFormat.yMMMd().format(tx.date)),
-                trailing: Text(
-                  '${tx.type == TransactionType.debit ? "-" : "+"} ₹${tx.amount.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: tx.type == TransactionType.credit
-                        ? Colors.green
-                        : Colors.red,
-                  ),
-                ),
-              ),
-              const Divider(height: 1),
+              _buildSummaryCard("Incoming", _incoming, Colors.green),
+              const SizedBox(width: 12),
+              _buildSummaryCard("Outgoing", _outgoing, Colors.red),
             ],
           ),
-        );
-      },
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: _transactions.length,
+            itemBuilder: (cntx, ind) {
+              final tx = _transactions[ind];
+              final category = _categoryMap[tx.categoryId];
+
+              return Dismissible(
+                key: ValueKey(_transactions[ind]),
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Icon(Icons.delete, color: Colors.white),
+                ),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) async {
+                  await db.deleteTransaction(tx.id!);
+                  final double incoming = await db.totalIncoming();
+                  final double outgoing = await db.totalOutgoing();
+                  setState(() {
+                    _transactions.removeAt(ind);
+                    _incoming = incoming;
+                    _outgoing = outgoing;
+                  });
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).clearSnackBars();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${tx.title} dismissed')),
+                  );
+                },
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            category?.color.withAlpha(40) ??
+                            Colors.grey.withAlpha(40),
+                        child: Icon(
+                          category?.icon ?? Icons.help_outline,
+                          color: category?.color ?? Colors.grey,
+                        ),
+                      ),
+                      title: Text(
+                        tx.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      subtitle: Text(DateFormat.yMMMd().format(tx.date)),
+                      trailing: Text(
+                        '${tx.type == TransactionType.debit ? "-" : "+"} ₹${tx.amount.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: tx.type == TransactionType.credit
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCard(String title, double amount, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: color.withAlpha(25),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withAlpha(50)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "₹${amount.toStringAsFixed(2)}",
+              style: TextStyle(
+                color: color,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -52,6 +52,22 @@ class DatabaseHelper {
     });
   }
 
+  Future<double> totalIncoming() async {
+    final db = await database;
+    final List<Map<String, dynamic>> ans = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM transactions WHERE type="credit"',
+    );
+    return (ans[0]['total'] ?? 0.0) as double;
+  }
+
+  Future<double> totalOutgoing() async {
+    final db = await database;
+    final List<Map<String, dynamic>> ans = await db.rawQuery(
+      'SELECT SUM(amount) as total FROM transactions WHERE type="debit"',
+    );
+    return (ans[0]['total'] ?? 0.0) as double;
+  }
+
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'finance_vault.db');
