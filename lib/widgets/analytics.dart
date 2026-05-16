@@ -74,136 +74,145 @@ class _AnalyticsState extends State<Analytics>
 
     final spendingEntries = _categoriesSpending.entries.toList();
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Card(
-              elevation: 0,
-              color: Theme.of(context).colorScheme.primaryContainer,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Total Net Balance',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+    return RefreshIndicator(
+      onRefresh: () async => _loadData(),
+      displacement: 40,
+      color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Card(
+                elevation: 0,
+                color: Theme.of(context).colorScheme.primaryContainer,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Total Net Balance',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '₹${_balance.toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onPrimaryContainer,
-                          ),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        '₹${_balance.toStringAsFixed(2)}',
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimaryContainer,
+                            ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            Text(
-              'Income vs Expenses',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) {
-                return CustomPaint(
-                  size: const Size(double.infinity, 24),
-                  painter: SummaryBarPainter(
-                    totalIn: _totalIn,
-                    totalOut: _totalOut,
-                    animationFactor: _animation.value,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'In: ₹${_totalIn.toStringAsFixed(0)}',
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Out: ₹${_totalOut.toStringAsFixed(0)}',
-                  style: const TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 32),
-
-            Text(
-              'Spending by Category',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: AnimatedBuilder(
+              Text(
+                'Income vs Expenses',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 12),
+              AnimatedBuilder(
                 animation: _animation,
                 builder: (context, child) {
                   return CustomPaint(
-                    size: const Size(200, 200),
-                    painter: FinanceChartPainter(
-                      categorySpending: _categoriesSpending,
-                      categoryMap: _categoryMap,
+                    size: const Size(double.infinity, 24),
+                    painter: SummaryBarPainter(
+                      totalIn: _totalIn,
+                      totalOut: _totalOut,
                       animationFactor: _animation.value,
                     ),
                   );
                 },
               ),
-            ),
-
-            const SizedBox(height: 24),
-
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: spendingEntries.length,
-              itemBuilder: (cntx, index) {
-                final entry = spendingEntries[index];
-                final category = _categoryMap[entry.key];
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: CircleAvatar(
-                    backgroundColor: category?.color.withAlpha(30),
-                    child: Icon(
-                      category?.icon,
-                      color: category?.color,
-                      size: 18,
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'In: ₹${_totalIn.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  title: Text(category?.name ?? 'Unknown'),
-                  trailing: Text(
-                    '₹${entry.value.toStringAsFixed(2)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    'Out: ₹${_totalOut.toStringAsFixed(0)}',
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                );
-              },
-            ),
-          ],
+                ],
+              ),
+
+              const SizedBox(height: 32),
+
+              Text(
+                'Spending by Category',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return CustomPaint(
+                      size: const Size(200, 200),
+                      painter: FinanceChartPainter(
+                        categorySpending: _categoriesSpending,
+                        categoryMap: _categoryMap,
+                        animationFactor: _animation.value,
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: spendingEntries.length,
+                itemBuilder: (cntx, index) {
+                  final entry = spendingEntries[index];
+                  final category = _categoryMap[entry.key];
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: CircleAvatar(
+                      backgroundColor: category?.color.withAlpha(30),
+                      child: Icon(
+                        category?.icon,
+                        color: category?.color,
+                        size: 18,
+                      ),
+                    ),
+                    title: Text(category?.name ?? 'Unknown'),
+                    trailing: Text(
+                      '₹${entry.value.toStringAsFixed(2)}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
