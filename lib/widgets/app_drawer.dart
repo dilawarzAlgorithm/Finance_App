@@ -1,3 +1,4 @@
+import 'package:finance_app/screens/add_category.dart';
 import 'package:finance_app/screens/add_transaction.dart';
 import 'package:flutter/material.dart';
 
@@ -57,6 +58,31 @@ class AppDrawer extends StatelessWidget {
             Navigator.of(context).pop();
             final result = await Navigator.of(context).push(
               MaterialPageRoute(builder: (cntx) => AddTransactionScreen()),
+            );
+            if (result == true) {
+              onTransactionAdded();
+            }
+          },
+        ),
+        Divider(height: 2, thickness: 2),
+        ListTile(
+          tileColor: theme.colorScheme.tertiary.withAlpha(40),
+          leading: Icon(Icons.category, color: theme.colorScheme.secondary),
+          title: Text(
+            'New Category',
+            style: theme.textTheme.titleMedium!.copyWith(
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+          trailing: Icon(
+            Icons.chevron_right,
+            size: 20,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          onTap: () async {
+            Navigator.of(context).pop();
+            final result = await Navigator.of(context).push(
+              MaterialPageRoute(builder: (cntx) => const AddCategoryScreen()),
             );
             if (result == true) {
               onTransactionAdded();

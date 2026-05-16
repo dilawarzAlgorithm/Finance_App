@@ -25,6 +25,16 @@ class DatabaseHelper {
     });
   }
 
+  Future<bool> doesCategoryExist(String name) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'categories',
+      where: 'LOWER(name) = ?',
+      whereArgs: [name.toLowerCase().trim()],
+    );
+    return maps.isNotEmpty;
+  }
+
   Future<void> deleteTransaction(int id) async {
     final db = await database;
     db.delete('transactions', where: 'id = ?', whereArgs: [id]);
@@ -58,6 +68,11 @@ class DatabaseHelper {
   void saveTransaction(TransactionModel newTransaction) async {
     final db = await database;
     await db.insert('transactions', newTransaction.toMap());
+  }
+
+  Future<void> saveCategory(CategoryModel newCategory) async {
+    final db = await database;
+    await db.insert('categories', newCategory.toMap());
   }
 
   Future<Database> _initDatabase() async {

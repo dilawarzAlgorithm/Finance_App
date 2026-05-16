@@ -39,7 +39,7 @@ class FinanceChartPainter extends CustomPainter {
     }
 
     final holePaint = Paint()..color = Colors.white;
-    canvas.drawCircle(center, radius * 0.6, holePaint);
+    canvas.drawCircle(center, radius * 0.5, holePaint);
   }
 
   @override
