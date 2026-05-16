@@ -94,7 +94,7 @@ class _TransactionsState extends State<Transactions> {
                     _transactions.removeAt(ind);
                     _loadData();
                   });
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).clearSnackBars();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('${tx.title} dismissed')),
