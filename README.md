@@ -64,22 +64,24 @@ lib/
 ## Database Schema & Relational Structure
 
 **Categories Table**
-| Column | SQL Type | Modifiers |
-| :----: | :------: | : ------: |
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT |
-| name | TEXT | NOT NULL |
-| color | TEXT | NOT NULL (Hex Code) |
-| icon_path | TEXT | NOT NULL (Asset Path) |
+
+|  Column   | SQL Type |         Modifiers         |
+| :-------: | :------: | :-----------------------: |
+|    id     | INTEGER  | PRIMARY KEY AUTOINCREMENT |
+|   name    |   TEXT   |         NOT NULL          |
+|   color   |   TEXT   |    NOT NULL (Hex Code)    |
+| icon_path |   TEXT   |   NOT NULL (Asset Path)   |
 
 **Transactions Table**
-| Column | SQL Type | Modifiers |
-| :----: | :------: | : ------: |
-| id | INTEGER | PRIMARY KEY AUTOINCREMENT |
-| title | TEXT | NOT NULL |
-| amount | REAL | NOT NULL |
-| date | TEXT | NOT NULL (ISO8601 String) |
-| type | TEXT | NOT NULL (Enum Name) |
-| category_id | INTEGER | NOT NULL, FOREIGN KEY REFERENCES categories(id) |
+
+|   Column    | SQL Type |                    Modifiers                    |
+| :---------: | :------: | :---------------------------------------------: |
+|     id      | INTEGER  |            PRIMARY KEY AUTOINCREMENT            |
+|    title    |   TEXT   |                    NOT NULL                     |
+|   amount    |   REAL   |                    NOT NULL                     |
+|    date     |   TEXT   |            NOT NULL (ISO8601 String)            |
+|    type     |   TEXT   |              NOT NULL (Enum Name)               |
+| category_id | INTEGER  | NOT NULL, FOREIGN KEY REFERENCES categories(id) |
 
 ## Getting Started & Local Setup
 
